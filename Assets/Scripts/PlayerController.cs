@@ -4,13 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class PlayerController : UserData
 {
-    public CharacterMoveController moveButton;
-    //public BloodController bloodController;
+    public FixedJoystick joystick;
     public CharacterStatus characterStatus = CharacterStatus.idling;
     public Scoring scoring;
     public string answer = string.Empty;
@@ -19,9 +17,10 @@ public class PlayerController : UserData
     public bool IsCheckedAnswer = false;
     public CanvasGroup answerBoxCg;
     public Image answerBoxFrame;
-    public float speed;
     [HideInInspector]
     public Transform characterTransform;
+    public float limitMovingXOffsetPercentage = 0.95f;
+    public float limitMovingYOffsetPercentage = 0.95f;
     [HideInInspector]
     public Canvas characterCanvas = null;
     public Vector3 startPosition = Vector3.zero;
@@ -35,6 +34,7 @@ public class PlayerController : UserData
     public RectTransform rectTransform = null;
     public float rotationSpeed = 200f; // Speed of rotation
     public float moveSpeed = 5f; // Speed of movement
+    //public Ease movingEase = Ease.Linear;
     private Rigidbody2D rb = null;
    // public bool isRotating = true;
     public Vector3 playerCurrentPosition = Vector3.zero;
@@ -46,6 +46,13 @@ public class PlayerController : UserData
     public GameObject playerAppearEffect;
     public GameObject[] answerParticles;
     public float resetCount = 5.0f;
+
+    public bool IsFlipped
+    {
+        get {
+            return this.UserId < 2 ? false : true;
+        }
+    }
 
     public void Init(CharacterSet characterSet = null, Sprite[] defaultAnswerBoxes = null, Vector3 startPos = default)
     {
@@ -76,7 +83,7 @@ public class PlayerController : UserData
         this.GetComponent<CircleCollider2D>().enabled = true;
         SetUI.Set(this.bornParticle, true, 1f);
         this.characterStatus = CharacterStatus.born;
-        this.transform.DOScale(1f, 1f).OnComplete(()=>
+        this.transform.DOScale(this.IsFlipped ? -1f : 1f, 1f).OnComplete(()=>
         {
             this.characterStatus = CharacterStatus.idling;
             this.playerAppearEffect.SetActive(false);
@@ -97,30 +104,16 @@ public class PlayerController : UserData
 
         if(this.answerBoxCg != null ) {
             this.answerBoxCg.transform.localScale = Vector3.zero;
-            if (this.UserId < 2)
-            {
-                this.answerBoxCg.transform.localPosition = new Vector2(60f, -60f);
-            }
-            else
-            {
-                this.answerBoxCg.transform.localPosition = new Vector2(-60f, 60f);
-            }
+            this.answerBoxCg.transform.localPosition = this.IsFlipped ? new Vector2(60f, -60f) : new Vector2(60f, -60f);
             SetUI.SetScale(this.answerBoxCg, false);
             this.answerBox = this.answerBoxCg.GetComponentInChildren<TextMeshProUGUI>();
         }
 
-        if (this.moveButton == null)
+        if (this.joystick == null)
         {
-            this.moveButton = GameObject.FindGameObjectWithTag("P" + this.RealUserId + "-controller").GetComponent<CharacterMoveController>();
-            this.moveButton.OnPointerDownEvent += this.StopRotation;
-            this.moveButton.OnPointerUpEvent += this.StopMove;
+            this.joystick = GameObject.FindGameObjectWithTag("P" + this.RealUserId + "-controller").GetComponent<FixedJoystick>();
         }
 
-        /*if (this.bloodController == null)
-        {
-            this.bloodController = GameObject.FindGameObjectWithTag("P" + this.RealUserId + "_Blood").GetComponent<BloodController>();
-        }
-        */
         if (this.PlayerIcons[0] == null)
         {
             this.PlayerIcons[0] = GameObject.FindGameObjectWithTag("P" + this.RealUserId + "_Icon").GetComponent<PlayerIcon>();
@@ -142,7 +135,6 @@ public class PlayerController : UserData
         }
 
         this.scoring.init();
-        this.characterStatus = CharacterStatus.rotating;
         this.reducedFactor = this.reduceBaseFactor;
     }
 
@@ -334,7 +326,7 @@ public class PlayerController : UserData
 
     void FixedUpdate()
     {
-        if(this.rectTransform != null)
+        /*if(this.rectTransform != null)
         {
             switch (this.characterStatus)
             {
@@ -342,45 +334,76 @@ public class PlayerController : UserData
                 case CharacterStatus.idling:
                     this.StopCharacter();
                     return;
-                case CharacterStatus.rotating:
-                    this.moveButton.TriggerActive(true);
-                    Vector3 direction = Vector3.forward * rotationSpeed * Time.deltaTime * this.randomDirection;
-                    this.rectTransform.Rotate(direction);
-                    break;
                 case CharacterStatus.moving:
-                    this.MoveForward();
+
                     break;
                 case CharacterStatus.nextQA:
                     this.HoldCharacter();
                     break;
-                case CharacterStatus.recover:
-                    if(this.resetCount > 0f)
-                    {
-                        this.resetCount -= Time.deltaTime;
-                    }
-                    else
-                    {
-                        var gridManager = GameController.Instance.gridManager;
-                        this.playerReset(gridManager.newCharacterPosition);
-                    }
-                    break;
             }
 
-            if (Input.GetKeyDown(KeyCode.Space) && this.UserId == 0)
+        }*/
+
+        if (this.joystick == null || this.playerAppearEffect.activeInHierarchy) return;
+        Vector2 direction = Vector2.zero;
+
+        if (this.rectTransform != null)
+        {
+            direction = new Vector2(this.joystick.Horizontal, this.joystick.Vertical);
+
+            if (this.UserId == 0) // only player one can use
+            {
+                if (Input.GetKey(KeyCode.UpArrow))
+                {
+                    direction.y = 1;
+                }
+                else if (Input.GetKey(KeyCode.DownArrow))
+                {
+                    direction.y = -1;
+                }
+                if (Input.GetKey(KeyCode.LeftArrow))
+                {
+                    direction.x = -1;
+                }
+                else if (Input.GetKey(KeyCode.RightArrow))
+                {
+                    direction.x = 1;
+                }
+            }
+
+            if (direction.magnitude > 1)
+            {
+                direction.Normalize();
+            }
+            Vector3 newPosition = this.characterTransform.position + (Vector3)direction * this.moveSpeed * Time.deltaTime;
+            newPosition.x = Mathf.Clamp(newPosition.x, 
+                                        -Camera.main.orthographicSize * Camera.main.aspect * this.limitMovingXOffsetPercentage, 
+                                        Camera.main.orthographicSize * Camera.main.aspect * this.limitMovingXOffsetPercentage);
+            newPosition.y = Mathf.Clamp(newPosition.y, 
+                                        -Camera.main.orthographicSize * Camera.main.aspect * (this.limitMovingYOffsetPercentage - 0.25f), 
+                                        Camera.main.orthographicSize * Camera.main.aspect * this.limitMovingYOffsetPercentage);
+
+            this.characterTransform.position = newPosition;
+            //this.characterTransform.DOMove(newPosition, 0.05f).SetEase(this.movingEase);
+            this.rectTransform.localScale = new Vector3(direction.x > 0 ? -0.65f : 0.65f, 0.65f, 1);
+        }
+        else
+        {
+            this.characterTransform.localPosition = new Vector2(this.characterTransform.localPosition.x, 220f);
+        }
+
+        if (direction.magnitude > 0.1f)
+        {
+            if (this.characterStatus != CharacterStatus.moving)
             {
                 this.characterStatus = CharacterStatus.moving;
-                this.moveDirection = this.rectTransform.up;
             }
-
-            bool isMoving = this.rb.velocity.sqrMagnitude > 0.05f;
-            if (isMoving)
+        }
+        else
+        {
+            if (this.characterStatus != CharacterStatus.idling)
             {
-                this.rb.velocity *= this.reducedFactor;
-            }
-            else
-            {
-                this.reducedFactor = this.reduceBaseFactor;
-                this.rb.velocity = Vector3.zero;
+                this.characterStatus = CharacterStatus.idling;
             }
         }
     }
@@ -393,35 +416,6 @@ public class PlayerController : UserData
         this.randomDirection =  UnityEngine.Random.Range(0, 2) == 0 ? 1f : -1f;
     }
 
-    public void StopRotation(BaseEventData data)
-    {
-        if(this.characterStatus == CharacterStatus.rotating && 
-           this.transform.localScale == Vector3.one && 
-           this.GetComponent<Collider2D>().enabled)
-        {
-            this.moveButton.PointerEffect(true);
-            AudioController.Instance?.PlayAudio(0);
-            this.playerCurrentPosition = this.transform.localPosition;
-            this.moveDirection = this.rectTransform.up;
-            this.characterStatus = CharacterStatus.moving;
-        }
-    }
-
-    public void StopMove(BaseEventData data)
-    {
-        if(this.characterStatus != CharacterStatus.nextQA)
-        {
-            this.moveButton.PointerEffect(false);
-            this.characterStatus = CharacterStatus.idling;
-        }
-    }
-
-    void MoveForward()
-    {
-        this.rb.velocity = this.moveDirection * this.moveSpeed;
-        this.rb.angularVelocity = 0f;
-        //this.FaceDirection(this.moveDirection);
-    }
 
     public void playerReset(Vector3 newStartPostion)
     {
@@ -431,7 +425,7 @@ public class PlayerController : UserData
         if(this.playerAppearEffect != null) this.playerAppearEffect.SetActive(true);
         this.GetComponent<CircleCollider2D>().enabled = true;
 
-        this.transform.DOScale(1f, 1f).OnComplete(() =>
+        this.transform.DOScale(this.IsFlipped ? -1f: 1f, 1f).OnComplete(() =>
         {
             if(this.characterStatus != CharacterStatus.nextQA)
             {
@@ -465,8 +459,7 @@ public class PlayerController : UserData
             {
                 this.answer += content;
             }
-            float endValue = this.UserId < 2 ? 1f : -1f;
-            SetUI.SetScale(this.answerBoxCg, true, endValue, 0.5f, Ease.OutElastic);
+            SetUI.SetScale(this.answerBoxCg, true, 1f, 0.5f, Ease.OutElastic);
         }
 
         if(this.answerBox != null)
@@ -558,37 +551,13 @@ public class PlayerController : UserData
                 }
             }
         }
-        else if (other.CompareTag("Wall"))
-        {
-            this.ReBornCharacter();
-        }
     }
 
-    void StopCharacter()
-    {
-        this.rb.velocity = Vector2.zero;
-        this.rb.angularVelocity = 0f;
-        if(this.characterStatus != CharacterStatus.born) this.characterStatus = CharacterStatus.rotating;
-    }
 
     void HoldCharacter()
     {
         this.rb.velocity = Vector2.zero;
         this.rb.angularVelocity = 0f;
-    }
-
-    void ReBornCharacter()
-    {
-        if (this.GetComponent<CircleCollider2D>().enabled)
-        {
-            SetUI.SetScale(this.answerBoxCg, false);
-            AudioController.Instance?.PlayAudio(11, false, 0.5f);
-            this.deductAnswer();
-            this.characterStatus = CharacterStatus.recover;
-            this.transform.DOScale(0f, 1f);
-            this.moveButton.TriggerActive(false);
-            this.GetComponent<CircleCollider2D>().enabled = false;
-        }
     }
 
     private void OnTriggerExit2D(Collider2D other)

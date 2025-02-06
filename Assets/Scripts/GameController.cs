@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using System.Linq;
 public class GameController : GameBaseController
 {
     public static GameController Instance = null;
@@ -104,12 +105,13 @@ public class GameController : GameBaseController
                 }
 
                 var notUsedPlayerController = GameObject.FindGameObjectWithTag("P" + notUsedId + "-controller");
-                if (notUsedPlayerController != null)
+                if (notUsedPlayerController != null) notUsedPlayerController.SetActive(false);
+                /*if (notUsedPlayerController != null)
                 {
                     var notUsedMoveController = notUsedPlayerController.GetComponent<CharacterMoveController>();
                     notUsedMoveController.TriggerActive(false);
-                }
-                   // notUsedPlayerController.SetActive(false);
+                }*/
+                // notUsedPlayerController.SetActive(false);
             }
         }
     }
@@ -168,16 +170,55 @@ public class GameController : GameBaseController
 
         if (this.choiceText != null)
         {
-            string formattedText = ""; // Initialize a string to hold the formatted answers
-
-            for (int i = 0; i < currentQuestion.answersChoics.Length; i++)
+            if(currentQuestion.answersChoics != null)
             {
-                char label = (char)('A' + i); // Convert index to corresponding letter
-                formattedText += label + ": " + currentQuestion.answersChoics[i] + "\n"; // Append each formatted answer
+                string formattedText = ""; // Initialize a string to hold the formatted answers
+
+                for (int i = 0; i < currentQuestion.answersChoics.Length; i++)
+                {
+                    char label = (char)('A' + i); // Convert index to corresponding letter
+                    formattedText += label + ": " + currentQuestion.answersChoics[i] + "\n"; // Append each formatted answer
+                }
+                this.choiceText.text = formattedText; // Set the combined text to the txt
             }
-            this.choiceText.text = formattedText; // Set the combined text to the txt
+            else
+            {
+                this.fullQAText = currentQuestion.qa.question;
+                int answerLength = currentQuestion.correctAnswer.Length;
+                int existingUnderscoreCount = this.fullQAText.Count(c => c == '_');
+                this.hiddenPart = new string('_', answerLength);
+
+                this.choiceText.text = this.fullQAText.Replace(new string('_', existingUnderscoreCount), this.hiddenPart);
+                this.correctAnswersLetter = currentQuestion.correctAnswer.ToCharArray();
+                /*
+                if (!string.IsNullOrEmpty(this.fullQAText)) {
+                    this.hiddenPart = "";
+                    // Loop through each character in the full question
+                    foreach (char c in this.fullQAText)
+                    {
+                        if (c == '_')
+                        {
+                            this.hiddenPart += "_";
+                        }
+                    }
+                }*/
+            }
         }
     }
+
+
+    public string fullQAText = "";
+    public string hiddenPart = "";
+    public char[] correctAnswersLetter;
+
+    public void updateQAFillInBlank(string letter)
+    {
+        string c = letter.ToLower();
+
+
+    }
+
+
 
     public void PrepareNextQuestion()
     {
@@ -340,8 +381,6 @@ public enum CharacterStatus
 {
     born,
     idling,
-    rotating,
     moving,
-    nextQA,
-    recover
+    nextQA
 }
