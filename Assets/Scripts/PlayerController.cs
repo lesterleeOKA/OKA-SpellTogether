@@ -183,27 +183,7 @@ public class PlayerController : UserData
     public void checkAnswer(int currentTime, Action onCompleted = null)
     {
         var currentQuestion = QuestionController.Instance?.currentQuestion;
-        if(currentQuestion.answersChoics == null || currentQuestion.answersChoics.Length == 0) return;
-
-        var getChoice = this.answerBox.text;
         var lowerQIDAns = currentQuestion.correctAnswer.ToLower();
-        switch (getChoice)
-        {
-            case "A":
-                this.answer = currentQuestion.answersChoics[0].ToLower();
-                break;
-            case "B":
-                this.answer = currentQuestion.answersChoics[1].ToLower();
-                break;
-            case "C":
-                this.answer = currentQuestion.answersChoics[2].ToLower();
-                break;
-            case "D":
-                this.answer = currentQuestion.answersChoics[3].ToLower();
-                break;
-        }
-        if(this.answer != lowerQIDAns) 
-            return;
 
         if (!this.IsCheckedAnswer)
         {
@@ -435,35 +415,69 @@ public class PlayerController : UserData
             }
         });
         this.deductAnswer();
-        this.setAnswer("");
+        this.setAnswer(null);
         this.characterReset(newStartPostion);
         this.IsCheckedAnswer = false;
         this.IsCorrect = false;
         this.resetCount = 2.0f;
     }
 
-    public void setAnswer(string content)
+    public void setAnswer(Cell cell)
     {
-        if (string.IsNullOrEmpty(content))
+        if (cell == null)
         {
             this.answer = "";
             SetUI.SetScale(this.answerBoxCg, false);
         }
         else
         {
+            string content = cell.content.text;
             var gridManager = GameController.Instance.gridManager;
             if (gridManager.isMCType) { 
                 this.answer = content;
             }
             else
             {
-                this.answer += content;
+                GameController.Instance.updateQAFillInBlank(cell, 
+                ()=>
+                {
+                    //Correct
+                    AudioController.Instance?.PlayAudio(9);
+                    gridManager.removeCollectedCellId(cell);
+                    cell.setGetWordEffect(true, 
+                                          GameController.Instance.flyingPositions[this.UserId < 2 ? 0: 1],
+                                          ()=>
+                                          {
+                                              GameController.Instance.UpdateDisplayedQuestion();
+                                          });
+                    this.collectedCell.Add(cell);
+                },
+                ()=>
+                {
+                    //Wrong
+                    AudioController.Instance?.PlayAudio(10);
+                    LogController.Instance.debug("wrong letter!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    gridManager.updateNewWordPosition(cell);
+                }
+                );
             }
-            SetUI.SetScale(this.answerBoxCg, true, 1f, 0.5f, Ease.OutElastic);
         }
+    }
 
-        if(this.answerBox != null)
+    public void correctAction(Cell cell)
+    {
+        this.answer += cell.content.text;
+        //SetUI.SetScale(this.answerBoxCg, true, 1f, 0.5f, Ease.OutElastic);
+        if (this.answerBox != null)
             this.answerBox.text = this.answer;
+    }
+
+    public void finishedAction()
+    {
+        LogController.Instance.debug("finished spelling!!!!!!!!!!!!!!!!!!!!!!");
+        var gameTimer = GameController.Instance.gameTimer;
+        int currentTime = Mathf.FloorToInt(((gameTimer.gameDuration - gameTimer.currentTime) / gameTimer.gameDuration) * 100);
+        this.checkAnswer(currentTime);
     }
 
     public void autoDeductAnswer()
@@ -494,7 +508,7 @@ public class PlayerController : UserData
             if (gridManager.isMCType)
             {
                 deductedChar = this.answer;
-                this.setAnswer("");
+                this.setAnswer(null);
             }
             else
             {
@@ -529,9 +543,6 @@ public class PlayerController : UserData
                 cell.setCellEnterColor(true, GameController.Instance.showCells);
                 if (cell.isSelected && this.Retry > 0)
                 {
-                    //LogController.Instance.debug("Player has entered the trigger!" + other.name);
-                    AudioController.Instance?.PlayAudio(9);
-
                     var gridManager = GameController.Instance.gridManager;
                     if (gridManager.isMCType){
                         if (this.collectedCell.Count > 0)
@@ -541,23 +552,11 @@ public class PlayerController : UserData
                             this.collectedCell.RemoveAt(this.collectedCell.Count - 1);
                         }
                     }
-                    this.setAnswer(cell.content.text);
-                    this.collectedCell.Add(cell);
-                    cell.SetTextStatus(false);
+                    this.setAnswer(cell);
                     this.characterStatus = CharacterStatus.idling;
-                    var gameTimer = GameController.Instance.gameTimer;
-                    int currentTime = Mathf.FloorToInt(((gameTimer.gameDuration - gameTimer.currentTime) / gameTimer.gameDuration) * 100);
-                    this.checkAnswer(currentTime);
                 }
             }
         }
-    }
-
-
-    void HoldCharacter()
-    {
-        this.rb.velocity = Vector2.zero;
-        this.rb.angularVelocity = 0f;
     }
 
     private void OnTriggerExit2D(Collider2D other)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using System.Linq;
+using System;
 public class GameController : GameBaseController
 {
     public static GameController Instance = null;
@@ -16,6 +17,7 @@ public class GameController : GameBaseController
     public bool showCells = false;
     public CanvasGroup[] audioTypeButtons, fillInBlankTypeButtons;
     public TextMeshProUGUI choiceText;
+    public Transform[] flyingPositions;
 
     protected override void Awake()
     {
@@ -185,11 +187,9 @@ public class GameController : GameBaseController
             {
                 this.fullQAText = currentQuestion.qa.question;
                 int answerLength = currentQuestion.correctAnswer.Length;
-                int existingUnderscoreCount = this.fullQAText.Count(c => c == '_');
                 this.hiddenPart = new string('_', answerLength);
-
-                this.choiceText.text = this.fullQAText.Replace(new string('_', existingUnderscoreCount), this.hiddenPart);
                 this.correctAnswersLetter = currentQuestion.correctAnswer.ToCharArray();
+                this.UpdateDisplayedQuestion();
                 /*
                 if (!string.IsNullOrEmpty(this.fullQAText)) {
                     this.hiddenPart = "";
@@ -206,18 +206,58 @@ public class GameController : GameBaseController
         }
     }
 
-
     public string fullQAText = "";
     public string hiddenPart = "";
     public char[] correctAnswersLetter;
+    public int fillLetterCount = 0;
 
-    public void updateQAFillInBlank(string letter)
+    public void updateQAFillInBlank(Cell cell, Action correctAction=null, Action inCorrectAction=null)
     {
-        string c = letter.ToLower();
+        if(this.correctAnswersLetter.Length > 0) {
 
+            if(this.fillLetterCount < this.correctAnswersLetter.Length)
+            {
+                string letter = cell.content.text;
+                string c = letter.ToLower();
+
+                if (this.correctAnswersLetter[this.fillLetterCount].ToString() == c)
+                {
+                    this.hiddenPart = this.hiddenPart.Remove(this.fillLetterCount, 1).Insert(this.fillLetterCount, c.ToString());
+                    this.fillLetterCount += 1;
+                    for (int i = 0; i < this.playerNumber; i++)
+                    {
+                        if (this.playerControllers[i] != null)
+                        {
+                            this.playerControllers[i].correctAction(cell);
+                        }
+                    }
+                    correctAction?.Invoke();               
+                }
+                else
+                {
+                    inCorrectAction?.Invoke();
+                }
+            }         
+        }
 
     }
 
+    public void UpdateDisplayedQuestion()
+    {
+        int existingUnderscoreCount = this.fullQAText.Count(c => c == '_');
+        this.choiceText.text = this.fullQAText.Replace(new string('_', existingUnderscoreCount), this.hiddenPart);
+
+        if (this.fillLetterCount == this.correctAnswersLetter.Length)
+        {
+            for (int i = 0; i < this.playerNumber; i++)
+            {
+                if (this.playerControllers[i] != null)
+                {
+                    this.playerControllers[i].finishedAction();
+                }
+            }
+        }
+    }
 
 
     public void PrepareNextQuestion()
@@ -235,6 +275,7 @@ public class GameController : GameBaseController
     public void UpdateNextQuestion()
     {
         LogController.Instance?.debug("Next Question");
+        this.fillLetterCount = 0;
         var questionController = QuestionController.Instance;
 
         if (questionController != null) {

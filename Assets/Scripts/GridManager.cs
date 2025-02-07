@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEngine;
 using System;
+using UnityEngine.UIElements;
 
 [Serializable]
 public class GridManager
@@ -66,6 +67,39 @@ public class GridManager
             return this.cells[newCellVector.x, newCellVector.y].transform.localPosition;
         }
     }
+
+    public void removeCollectedCellId(Cell currentCell)
+    {
+        if (this.showCellIdList.Contains(currentCell.cellId))
+        {
+            this.showCellIdList.Remove(currentCell.cellId);
+        }
+        currentCell.SetTextContent("");
+    }
+
+    public void updateNewWordPosition(Cell currentCell)
+    {
+        this.characterPositionsCellIds.Clear();
+        foreach (var cell in this.cells)
+        {
+            if (cell != null && cell.isPlayerStayed)
+            {
+                this.characterPositionsCellIds.Add(cell.cellId);
+            }
+        }
+        if (this.showCellIdList.Contains(currentCell.cellId))
+        {
+            this.showCellIdList.Remove(currentCell.cellId);
+        }
+        var newWordId = this.GenerateUniqueRandomIntegers(1, 0, this.cells.Length, this.showCellIdList, this.characterPositionsCellIds)[0];
+        LogController.Instance.debug("new Word Position id" + newWordId);
+        this.showCellIdList.Add(newWordId);
+        var newCellVector = this.availablePositions[newWordId];
+       // var newPosition = this.cells[newCellVector.x, newCellVector.y].transform.localPosition;
+        this.cells[newCellVector.x, newCellVector.y].SetTextContent(currentCell.content.text);
+        currentCell.SetTextContent("");
+    }
+
 
     public List<int> CharacterPositionsCellIds {
         get
@@ -169,6 +203,7 @@ public class GridManager
             for (int j = 0; j < this.gridColumn; j++)
             {
                 this.cells[i, j].SetTextContent("");
+                this.cells[i, j].setGetWordEffect(false);
             }
         }
 
@@ -184,6 +219,7 @@ public class GridManager
             //string displayText = $"{letter}: {multipleWords[i]}";
 
             this.cells[position.x, position.y].SetTextContent(this.isMCType ? displayText : letters[i].ToString());
+            
         }
     }
 

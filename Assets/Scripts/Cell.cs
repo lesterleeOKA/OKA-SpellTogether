@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using System;
 
 public class Cell : MonoBehaviour
 {
@@ -16,10 +17,12 @@ public class Cell : MonoBehaviour
     public bool isSelected = false;
     public bool isPlayerStayed = false;
     public int cellId = -1;
+    public Transform getWordParticle;
 
 
     public void SetTextContent(string letter="", Color _color = default, Sprite gridSprite = null)
     {
+        if(this.getWordParticle != null) this.getWordParticle.gameObject.SetActive(false);
         if (gridSprite != null) this.cellSprites[0] = gridSprite;
         if (this.cellImage == null) 
             this.cellImage = this.GetComponent<CanvasGroup>();
@@ -67,6 +70,18 @@ public class Cell : MonoBehaviour
         if(this.cellImage != null)
         {
             this.cellImage.alpha = show? 1f:0f;
+        }
+    }
+
+    public void setGetWordEffect(bool show, Transform target=null, Action _onComplete = null)
+    {
+        if (this.getWordParticle != null) { 
+            this.getWordParticle.gameObject.SetActive(show);
+            this.getWordParticle.DOMove(show? target.position : this.transform.position, show? 1f : 0f).SetEase(Ease.InOutSine).OnComplete(()=>
+            {
+                this.getWordParticle.gameObject.SetActive(false);
+                _onComplete?.Invoke();
+            });
         }
     }
 
