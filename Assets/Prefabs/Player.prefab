@@ -67496,8 +67496,8 @@ MonoBehaviour:
   answerBoxCg: {fileID: 1675126699777233684}
   answerBoxFrame: {fileID: 0}
   characterTransform: {fileID: 0}
-  limitMovingXOffsetPercentage: 0.55
-  limitMovingYOffsetPercentage: 0.61
+  limitMovingXOffsetPercentage: 0.8
+  limitMovingYOffsetPercentage: 0.9
   characterCanvas: {fileID: 0}
   startPosition: {x: 0, y: 0, z: 0}
   characterOrder: 11

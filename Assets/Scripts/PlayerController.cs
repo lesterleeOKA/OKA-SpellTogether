@@ -357,11 +357,11 @@ public class PlayerController : UserData
             }
             Vector3 newPosition = this.characterTransform.position + (Vector3)direction * this.moveSpeed * Time.deltaTime;
             newPosition.x = Mathf.Clamp(newPosition.x, 
-                                        -Camera.main.orthographicSize * Camera.main.aspect * this.limitMovingXOffsetPercentage, 
-                                        Camera.main.orthographicSize * Camera.main.aspect * this.limitMovingXOffsetPercentage);
+                                        -Camera.main.orthographicSize * this.limitMovingXOffsetPercentage, 
+                                        Camera.main.orthographicSize * this.limitMovingXOffsetPercentage);
             newPosition.y = Mathf.Clamp(newPosition.y, 
-                                        -Camera.main.orthographicSize * Camera.main.aspect * (this.limitMovingYOffsetPercentage - 0.25f), 
-                                        Camera.main.orthographicSize * Camera.main.aspect * this.limitMovingYOffsetPercentage);
+                                        -Camera.main.orthographicSize * (this.limitMovingYOffsetPercentage - 0.4f), 
+                                        Camera.main.orthographicSize * this.limitMovingYOffsetPercentage);
 
             this.characterTransform.position = newPosition;
             //this.characterTransform.DOMove(newPosition, 0.05f).SetEase(this.movingEase);
