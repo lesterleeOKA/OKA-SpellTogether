@@ -3,12 +3,13 @@ using System.Linq;
 using UnityEngine;
 using System;
 using UnityEngine.UIElements;
+using UnityEngine.UI;
 
 [Serializable]
 public class GridManager
 {
     public GameObject cellPrefab;
-    public Transform parent;
+    public GridLayoutGroup parent;
     public int gridRow = 4;
     public int gridColumn = 4;
     public int maxRetries = 10;
@@ -37,8 +38,10 @@ public class GridManager
 
     private void createCell(int rowId, int columnId)
     {
-        GameObject cellObject = GameObject.Instantiate(cellPrefab, this.parent != null ? this.parent : null);
-        cellObject.name = "Cell_" + rowId + "_" + columnId;
+        GameObject cellObject = GameObject.Instantiate(cellPrefab, this.parent != null ? this.parent.transform : null);
+        this.parent.constraintCount = this.gridColumn;
+        //cellObject.name = "Cell_" + rowId + "_" + columnId;
+        cellObject.name = "Cell_" + this.gridCount;
         Cell cell = cellObject.GetComponent<Cell>(); 
         cell.SetTextContent("");
         cell.row = rowId;
@@ -46,6 +49,11 @@ public class GridManager
         this.cells[rowId, columnId] = cell;
         this.cells[rowId, columnId].cellId = this.gridCount;
         this.availablePositions.Add(new Vector2Int(rowId, columnId));
+
+        if (this.gridCount >=48 & this.gridCount < 72)
+        {
+            this.disableCellIds.Add(this.gridCount);
+        }
         this.gridCount += 1;
     }
 
@@ -175,6 +183,7 @@ public class GridManager
         {
             if (!cell.isSelected)
             {
+                cell.setCellDebugStatus(status);
                 cell.setCellStatus(status);
             }
         }

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using TMPro;
 using System.Linq;
 using System;
+using UnityEngine.UI;
+
 public class GameController : GameBaseController
 {
     public static GameController Instance = null;
@@ -18,6 +20,13 @@ public class GameController : GameBaseController
     public CanvasGroup[] audioTypeButtons, fillInBlankTypeButtons;
     public TextMeshProUGUI choiceText;
     public Transform[] flyingPositions;
+
+    public string fullQAText = "";
+    public string hiddenPart = "";
+    public char[] correctAnswersLetter;
+    public int fillLetterCount = 0;
+
+    public CenterFillWords centerFillWords;
 
     protected override void Awake()
     {
@@ -57,9 +66,12 @@ public class GameController : GameBaseController
         {
             string word = questionController.currentQuestion.correctAnswer;
             this.gridManager.UpdateGridWithWord(null, word);
+            this.centerFillWords.UpdateFillWords(word.Length);
         }
         this.createPlayer();
     }
+
+    
 
     void createPlayer()
     {
@@ -190,26 +202,9 @@ public class GameController : GameBaseController
                 this.hiddenPart = new string('_', answerLength);
                 this.correctAnswersLetter = currentQuestion.correctAnswer.ToCharArray();
                 this.UpdateDisplayedQuestion();
-                /*
-                if (!string.IsNullOrEmpty(this.fullQAText)) {
-                    this.hiddenPart = "";
-                    // Loop through each character in the full question
-                    foreach (char c in this.fullQAText)
-                    {
-                        if (c == '_')
-                        {
-                            this.hiddenPart += "_";
-                        }
-                    }
-                }*/
             }
         }
     }
-
-    public string fullQAText = "";
-    public string hiddenPart = "";
-    public char[] correctAnswersLetter;
-    public int fillLetterCount = 0;
 
     public void updateQAFillInBlank(Cell cell, Action correctAction=null, Action inCorrectAction=null)
     {
@@ -223,7 +218,6 @@ public class GameController : GameBaseController
                 if (this.correctAnswersLetter[this.fillLetterCount].ToString() == c)
                 {
                     this.hiddenPart = this.hiddenPart.Remove(this.fillLetterCount, 1).Insert(this.fillLetterCount, c.ToString());
-                    this.fillLetterCount += 1;
                     for (int i = 0; i < this.playerNumber; i++)
                     {
                         if (this.playerControllers[i] != null)
@@ -231,7 +225,8 @@ public class GameController : GameBaseController
                             this.playerControllers[i].correctAction(cell);
                         }
                     }
-                    correctAction?.Invoke();               
+                    correctAction?.Invoke();
+                    this.fillLetterCount += 1;
                 }
                 else
                 {
@@ -239,13 +234,20 @@ public class GameController : GameBaseController
                 }
             }         
         }
-
     }
 
-    public void UpdateDisplayedQuestion()
+    public Transform FlyingPosition(int centerfillId)
+    {
+       int fillWordId = this.fillLetterCount;
+       return this.centerFillWords.storedFillWords[centerfillId].fillWords[fillWordId].transform;
+    }
+
+    public void UpdateDisplayedQuestion(string content = "")
     {
         int existingUnderscoreCount = this.fullQAText.Count(c => c == '_');
         this.choiceText.text = this.fullQAText.Replace(new string('_', existingUnderscoreCount), this.hiddenPart);
+
+        this.centerFillWords.FillWord(content);
 
         if (this.fillLetterCount == this.correctAnswersLetter.Length)
         {
@@ -276,6 +278,7 @@ public class GameController : GameBaseController
     {
         LogController.Instance?.debug("Next Question");
         this.fillLetterCount = 0;
+        this.centerFillWords.resetWord();
         var questionController = QuestionController.Instance;
 
         if (questionController != null) {
@@ -293,6 +296,7 @@ public class GameController : GameBaseController
             {
                 string word = questionController.currentQuestion.correctAnswer;
                 this.gridManager.UpdateGridWithWord(null, word);
+                this.centerFillWords.UpdateFillWords(word.Length);
             }
 
             this.playersResetPosition();
@@ -424,4 +428,127 @@ public enum CharacterStatus
     idling,
     moving,
     nextQA
+}
+
+[Serializable]
+public class CenterFillWords
+{
+    public GameObject fillWordPrefab;
+    public GridLayoutGroup[] filledWords;
+    public StoredFillWords[] storedFillWords;
+    public int centerLetterCount = 0;
+
+    public void UpdateFillWords(int wordLength)
+    {
+        for (int i = 0; i < this.filledWords.Length; i++)
+        {
+            int updateFillWords = wordLength - this.storedFillWords[i].WordLength;
+
+            if (updateFillWords > 0)
+            {
+                for (int j = 0; j < wordLength; j++)
+                {
+                    if (j < this.storedFillWords[i].WordLength)
+                    {
+                        if (this.storedFillWords[i].WordLength > 0)
+                        {
+                            this.storedFillWords[i].fillWords[j].gameObject.SetActive(true);
+                        }
+                    }
+                    else
+                    {
+                        var fillWord = GameObject.Instantiate(this.fillWordPrefab, this.filledWords[i].transform).GetComponent<FillWord>();
+                        fillWord.init("FillWord_" + this.storedFillWords[i].WordLength);
+                        this.storedFillWords[i].fillWords.Add(fillWord);
+                    }
+                }
+            }
+            else if (updateFillWords < 0)
+            {
+                for (int j = 0; j < this.storedFillWords[i].WordLength; j++)
+                {
+                    if (j < wordLength)
+                    {
+                        this.storedFillWords[i].fillWords[j].gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        this.storedFillWords[i].fillWords[j].gameObject.SetActive(false);
+                    }
+                }
+            }
+            else if (updateFillWords == 0)
+            {
+                for (int j = 0; j < this.storedFillWords[i].WordLength; j++)
+                {
+                    this.storedFillWords[i].fillWords[j].gameObject.SetActive(true);
+                }
+            }
+
+            this.storedFillWords[i].ResetWords();
+        }
+    }
+
+    public void FillWord(string content = "")
+    {
+        if (!string.IsNullOrEmpty(content))
+        {
+            for (int i = 0; i < this.storedFillWords.Length; i++)
+            {
+                this.storedFillWords[i].fillWords[this.centerLetterCount].SetContent(content);
+            }
+            this.centerLetterCount += 1;
+            for (int i = 0; i < this.storedFillWords.Length; i++)
+            {
+                this.storedFillWords[i].SetNextLetterHint(this.centerLetterCount);
+            }
+        }
+    }
+
+    public void resetWord()
+    {
+        this.centerLetterCount = 0;
+    }
+}
+
+
+[Serializable]
+public class StoredFillWords
+{
+    public string name;
+    public List<FillWord> fillWords = new List<FillWord>();
+
+    public int WordLength
+    {
+        get
+        {
+            return this.fillWords.Count;
+        }
+    }
+
+    public void SetNextLetterHint(int nextId)
+    {
+        for (int i = 0; i < this.fillWords.Count; i++)
+        {
+            if (i == nextId)
+                this.fillWords[i].SetHint(true);
+            else
+                this.fillWords[i].SetHint(false);
+        }
+    }
+
+    public void ResetWords()
+    {
+        for(int i = 0; i < this.fillWords.Count; i++)
+        {
+            if(i == 0) 
+                this.fillWords[i].SetHint(true);
+            else
+                this.fillWords[i].SetHint(false);
+
+            if (this.fillWords[i] != null) {
+                this.fillWords[i].SetContent("");
+            }
+        }
+    }
 }

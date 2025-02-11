@@ -444,11 +444,11 @@ public class PlayerController : UserData
                     //Correct
                     AudioController.Instance?.PlayAudio(9);
                     gridManager.removeCollectedCellId(cell);
-                    cell.setGetWordEffect(true, 
-                                          GameController.Instance.flyingPositions[this.UserId < 2 ? 0: 1],
+                    cell.setGetWordEffect(true,
+                                          GameController.Instance.FlyingPosition(this.UserId < 2 ? 0: 1),
                                           ()=>
                                           {
-                                              GameController.Instance.UpdateDisplayedQuestion();
+                                              GameController.Instance.UpdateDisplayedQuestion(content);
                                           });
                     this.collectedCell.Add(cell);
                 },

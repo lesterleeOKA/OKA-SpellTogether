@@ -73,6 +73,11 @@ public class Cell : MonoBehaviour
         }
     }
 
+    public void setCellDebugStatus(bool show = false)
+    {
+        this.GetComponent<Image>().enabled = show;
+    }
+
     public void setGetWordEffect(bool show, Transform target=null, Action _onComplete = null)
     {
         if (this.getWordParticle != null) { 
