@@ -50,7 +50,7 @@ public class GridManager
         this.cells[rowId, columnId].cellId = this.gridCount;
         this.availablePositions.Add(new Vector2Int(rowId, columnId));
 
-        if (this.gridCount >=48 & this.gridCount < 72)
+        if (this.gridCount >=27 & this.gridCount < 45)
         {
             this.disableCellIds.Add(this.gridCount);
         }

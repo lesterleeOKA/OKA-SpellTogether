@@ -270,13 +270,14 @@ public class PlayerController : UserData
         float delay = 2f;
         if (correct)
         {
-            GameController.Instance?.PrepareNextQuestion();
+            this.characterStatus = CharacterStatus.nextQA;
             LogController.Instance?.debug("Add marks" + this.Score);
             GameController.Instance?.setGetScorePopup(true);
             AudioController.Instance?.PlayAudio(1);
             yield return new WaitForSeconds(delay);
             GameController.Instance?.setGetScorePopup(false);
-            GameController.Instance?.UpdateNextQuestion();
+            //GameController.Instance?.UpdateNextQuestion();
+            this.IsTriggerToNextQuestion = true;
         }
         else
         {
@@ -596,7 +597,7 @@ public class PlayerController : UserData
                 // Debug log the collision information
                 LogController.Instance.debug($"Collision with: {collision.gameObject.name},distanceFactor: {distanceFactor}, Reduced Factor: {reducedFactor}, Distance: {distance}");
             }
-            AudioController.Instance?.PlayAudio(10); //blob
+            //AudioController.Instance?.PlayAudio(10); //blob
             this.characterStatus = CharacterStatus.idling;
         }
     }

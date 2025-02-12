@@ -59,6 +59,246 @@
       "questionType": "picture",
       "question": "There are ___________ pears.",
       "correctAnswer": "fourteen"
+    },
+    {
+      "qid": "p3u2-c1",
+      "questionType": "audio",
+      "question": "general",
+      "correctAnswer": "general"
+    },
+    {
+      "qid": "p3u2-c2",
+      "questionType": "audio",
+      "question": "maths",
+      "correctAnswer": "maths"
+    },
+    {
+      "qid": "p3u2-c3",
+      "questionType": "audio",
+      "question": "english",
+      "correctAnswer": "english"
+    },
+    {
+      "qid": "p3u2-c4",
+      "questionType": "audio",
+      "question": "physical",
+      "correctAnswer": "physical"
+    },
+    {
+      "qid": "p3u2-c5",
+      "questionType": "audio",
+      "question": "science",
+      "correctAnswer": "science"
+    },
+    {
+      "qid": "p3u2-c6",
+      "questionType": "audio",
+      "question": "history",
+      "correctAnswer": "history"
+    },
+    {
+      "qid": "p3u2-c7",
+      "questionType": "audio",
+      "question": "arts",
+      "correctAnswer": "arts"
+    },
+    {
+      "qid": "p3u2-c8",
+      "questionType": "audio",
+      "question": "geography",
+      "correctAnswer": "geography"
+    },
+    {
+      "qid": "p3u2-c9",
+      "questionType": "audio",
+      "question": "computer",
+      "correctAnswer": "computer"
+    },
+    {
+      "qid": "p3u2-c10",
+      "questionType": "audio",
+      "question": "music",
+      "correctAnswer": "music"
+    },
+    {
+      "qid": "p3u2-c11",
+      "questionType": "audio",
+      "question": "religious",
+      "correctAnswer": "religious"
+    },
+    {
+      "qid": "p3u2-c12",
+      "questionType": "audio",
+      "question": "project",
+      "correctAnswer": "project"
+    },
+    {
+      "qid": "p3u2-c13",
+      "questionType": "audio",
+      "question": "dictate",
+      "correctAnswer": "dictate"
+    },
+    {
+      "qid": "p3u2-c14",
+      "questionType": "audio",
+      "question": "visual",
+      "correctAnswer": "visual"
+    },
+    {
+      "qid": "p3u2-c15",
+      "questionType": "audio",
+      "question": "internet",
+      "correctAnswer": "internet"
+    },
+    {
+      "qid": "p3u2-c16",
+      "questionType": "audio",
+      "question": "outing",
+      "correctAnswer": "outing"
+    },
+    {
+      "qid": "p3u2-c17",
+      "questionType": "audio",
+      "question": "attention",
+      "correctAnswer": "attention"
+    },
+    {
+      "qid": "p3u2-c18",
+      "questionType": "audio",
+      "question": "listen",
+      "correctAnswer": "listen"
+    },
+    {
+      "qid": "p3u2-c19",
+      "questionType": "audio",
+      "question": "learn",
+      "correctAnswer": "learn"
+    },
+    {
+      "qid": "p3u2-c20",
+      "questionType": "audio",
+      "question": "improve",
+      "correctAnswer": "improve"
+    },
+    {
+      "qid": "p5u12-c1",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "examine"
+    },
+    {
+      "qid": "p5u12-c2",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "escape"
+    },
+    {
+      "qid": "p5u12-c3",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "prison"
+    },
+    {
+      "qid": "p5u12-c4",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "gun"
+    },
+    {
+      "qid": "p5u12-c5",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "pickpocketing"
+    },
+    {
+      "qid": "p5u12-c6",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "fingerprint"
+    },
+    {
+      "qid": "p5u12-c7",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "ambulance"
+    },
+    {
+      "qid": "p5u12-c8",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "look for"
+    },
+    {
+      "qid": "p5u12-c9",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "shoplifting"
+    },
+    {
+      "qid": "p5u12-c10",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "evidence"
+    },
+    {
+      "qid": "p5u12-c11",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "burglary"
+    },
+    {
+      "qid": "p5u12-c12",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "arrest"
+    },
+    {
+      "qid": "p5u12-c13",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "witness"
+    },
+    {
+      "qid": "p5u12-c14",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "chase"
+    },
+    {
+      "qid": "p5u12-c15",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "victim"
+    },
+    {
+      "qid": "p5u12-c16",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "robbery"
+    },
+    {
+      "qid": "p5u12-c17",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "handcuff"
+    },
+    {
+      "qid": "p5u12-c18",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "fire engine"
+    },
+    {
+      "qid": "p5u12-c19",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "theft"
+    },
+    {
+      "qid": "p5u12-c20",
+      "questionType": "picture",
+      "question": "",
+      "correctAnswer": "thief"
     }
   ]
 

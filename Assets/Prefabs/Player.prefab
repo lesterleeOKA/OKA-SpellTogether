@@ -67285,8 +67285,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 228, y: 278}
+  m_AnchoredPosition: {x: -0.584, y: 0.292}
+  m_SizeDelta: {x: 329.6095, y: 400.8984}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3479291929700819819
 CanvasRenderer:
@@ -67382,7 +67382,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 125, y: 125}
+  m_SizeDelta: {x: 180, y: 180}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6666391858971732777
 CanvasRenderer:
@@ -67426,7 +67426,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 60
+  m_Radius: 90
 --- !u!50 &2329106319379218264
 Rigidbody2D:
   serializedVersion: 4
@@ -67496,7 +67496,7 @@ MonoBehaviour:
   answerBoxCg: {fileID: 1675126699777233684}
   answerBoxFrame: {fileID: 0}
   characterTransform: {fileID: 0}
-  limitMovingXOffsetPercentage: 0.82
+  limitMovingXOffsetPercentage: 0.78
   limitMovingYOffsetPercentage: 0.9
   characterCanvas: {fileID: 0}
   startPosition: {x: 0, y: 0, z: 0}
@@ -77547,7 +77547,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 51, y: 51}
+  m_SizeDelta: {x: 76, y: 76}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8394422289689829493
 CanvasRenderer:

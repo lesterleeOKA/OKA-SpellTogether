@@ -22,7 +22,9 @@ public class Cell : MonoBehaviour
 
     public void SetTextContent(string letter="", Color _color = default, Sprite gridSprite = null)
     {
-        if(this.getWordParticle != null) this.getWordParticle.gameObject.SetActive(false);
+        if(this.getWordParticle != null) { 
+            this.getWordParticle.gameObject.SetActive(false);
+        }
         if (gridSprite != null) this.cellSprites[0] = gridSprite;
         if (this.cellImage == null) 
             this.cellImage = this.GetComponent<CanvasGroup>();
@@ -85,6 +87,7 @@ public class Cell : MonoBehaviour
             this.getWordParticle.DOMove(show? target.position : this.transform.position, show? 1f : 0f).SetEase(Ease.InOutSine).OnComplete(()=>
             {
                 this.getWordParticle.gameObject.SetActive(false);
+                this.getWordParticle.DOMove(this.transform.position, 0f);
                 _onComplete?.Invoke();
             });
         }

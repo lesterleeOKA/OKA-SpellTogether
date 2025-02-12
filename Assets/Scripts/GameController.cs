@@ -245,7 +245,14 @@ public class GameController : GameBaseController
     public void UpdateDisplayedQuestion(string content = "")
     {
         int existingUnderscoreCount = this.fullQAText.Count(c => c == '_');
-        this.choiceText.text = this.fullQAText.Replace(new string('_', existingUnderscoreCount), this.hiddenPart);
+
+        if (existingUnderscoreCount > 0) {
+            this.choiceText.text = this.fullQAText.Replace(new string('_', existingUnderscoreCount), this.hiddenPart);
+        }
+        else
+        {
+            this.choiceText.text = "";
+        }
 
         this.centerFillWords.FillWord(content);
 
@@ -341,83 +348,21 @@ public class GameController : GameBaseController
             this.UpdateNextQuestion();
         }
 
-        /*if (this.playerControllers.Count == 0) return;
-
-        for (int j = 0; j < SortOrderController.Instance.roads.Length; j++)
-        {
-            var road = SortOrderController.Instance.roads[j];
-            road.showRoadHint(false);
-            for (int i = 0; i < this.playerNumber; i++)
-            {
-                var characterCanvas = this.playerControllers[i].characterCanvas;
-                if (characterCanvas.sortingOrder == road.orderLayer && this.showCells)
-                {
-                    road.showRoadHint(true);
-                }
-            }  
-        }
-
-       // bool anyPlayerReachToSubmitPoint = false;
-
+        if (this.playerControllers.Count == 0) return;
+        bool isNextQuestion = true;
         for (int i = 0; i < this.playerNumber; i++)
         {
-            if (this.playerControllers[i] != null)
+            if (this.playerControllers[i] == null || !this.playerControllers[i].IsTriggerToNextQuestion)
             {
-                var player = this.playerControllers[i];
-                switch (player.stayTrail)
-                {
-                    case StayTrail.submitPoint:
-                        if (player.Retry > 0 && !this.showingPopup)
-                        {
-                            int currentTime = Mathf.FloorToInt(((this.gameTimer.gameDuration - this.gameTimer.currentTime) / this.gameTimer.gameDuration) * 100);
-                            this.playerControllers[i].checkAnswer(currentTime, () =>
-                            {
-                                for (int i = 0; i < this.playerNumber; i++)
-                                {
-                                    if (this.playerControllers[i] != null)
-                                    {
-                                        this.playerControllers[i].playerReset();
-                                    }
-                                }
-                            });
-                        }
-                        break;
-                    case StayTrail.startPoints:
-                        player.autoDeductAnswer();
-                        break;
-                }
+                isNextQuestion = false;
+                break;
             }
         }
 
-        bool isBattleMode = this.playerNumber > 1;
-
-        if (isBattleMode)
+        if (isNextQuestion)
         {
-            bool isNextQuestion = true;
-
-            for (int i = 0; i < this.playerNumber; i++)
-            {
-                if (this.playerControllers[i] == null || !this.playerControllers[i].IsTriggerToNextQuestion)
-                {
-                    isNextQuestion = false;
-                    break;
-                }
-            }
-
-            if (isNextQuestion)
-            {
-                this.UpdateNextQuestion();
-            }
+            this.UpdateNextQuestion();
         }
-        else
-        {
-            if (this.playerControllers[0] != null && this.playerControllers[0].IsTriggerToNextQuestion)
-            {
-                this.UpdateNextQuestion();
-            }
-        }
-        */
-
     } 
 }
 

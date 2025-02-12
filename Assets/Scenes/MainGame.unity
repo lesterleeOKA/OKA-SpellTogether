@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028331, g: 0.2257133, b: 0.3069217, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -4697,7 +4697,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -60}
+  m_AnchoredPosition: {x: 0, y: -50}
   m_SizeDelta: {x: 1460, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &397006444
@@ -11435,17 +11435,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 20
+    m_Left: 30
     m_Right: 0
-    m_Top: 35
+    m_Top: 40
     m_Bottom: 0
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 104, y: 104}
-  m_Spacing: {x: 18, y: 20}
+  m_CellSize: {x: 135, y: 135}
+  m_Spacing: {x: 26, y: 18}
   m_Constraint: 1
-  m_ConstraintCount: 13
+  m_ConstraintCount: 9
 --- !u!1 &840190898
 GameObject:
   m_ObjectHideFlags: 0
@@ -16181,7 +16181,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 60}
+  m_AnchoredPosition: {x: 0, y: 50}
   m_SizeDelta: {x: 1460, y: 125}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1309927258
@@ -25610,8 +25610,8 @@ MonoBehaviour:
   gridManager:
     cellPrefab: {fileID: 5728923318765693052, guid: 5a39f2cf240def340ac0598a58a9c2a1, type: 3}
     parent: {fileID: 837752451}
-    gridRow: 10
-    gridColumn: 12
+    gridRow: 8
+    gridColumn: 9
     maxRetries: 20
     characterPositionsCellIds: 
     disableCellIds: 
